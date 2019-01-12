@@ -23,7 +23,7 @@ Upgrade :
 
 cd ~/domoticz/plugins/SVT2
 
-git reset –-hard
+git reset --hard
 
 git pull --force
 
