@@ -296,7 +296,7 @@ class BasePlugin:
             # we check if not int temp error and if heating is requested and turn on or off the heating request device
             if not self.forced:
                 if not self.intemperror:
-                    if self.intemp < self.setpoint + 0.5:
+                    if self.intemp < self.setpoint - 0.3:
                         self.switchHeat(True)
                         if not Devices[7].nValue == 1:
                             Devices[7].Update(nValue = 1,sValue = Devices[7].sValue)
