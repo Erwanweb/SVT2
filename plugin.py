@@ -82,6 +82,7 @@ class BasePlugin:
         self.setpoint = 20.0
         self.endheat = datetime.now()
         self.nexttemps = datetime.now()
+        self.temptimeout = datetime.now()
         self.DTpresence = []
         self.Presencemode = False
         self.Presence = False
@@ -447,6 +448,7 @@ class BasePlugin:
 
         # set update flag for next temp update
         self.nexttemps = datetime.now() + timedelta(minutes=5)
+        now = datetime.now()
 
         # fetch all the devices from the API and scan for sensors
         noerror = True
@@ -477,12 +479,13 @@ class BasePlugin:
         nbtemps = len(listintemps)
         if nbtemps > 0:
             self.intemp = round(sum(listintemps) / nbtemps, 1)
-            Devices[6].Update(nValue=0,
-                              sValue=str(self.intemp))  # update the dummy device showing the current thermostat temp
+            Devices[6].Update(nValue=0, sValue=str(self.intemp))  # update the dummy device showing the current thermostat temp
+            self.temptimeout = datetime.now() + timedelta(minutes=30)
         else:
-            Domoticz.Error("No Inside Temperature found... Switching Thermostat Off")
-            Devices[1].Update(nValue=0, sValue="0")  # switch off the thermostat
-            noerror = False
+            if self.temptimeout <= now:
+                Domoticz.Error("No Inside Temperature found since more than 30 minutes... Switching Thermostat Off")
+                Devices[1].Update(nValue=0, sValue="0")  # switch off the thermostat
+                noerror = False
 
         # calculate the average outside temperature
         nbtemps = len(listouttemps)
